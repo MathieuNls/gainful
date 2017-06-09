@@ -1,0 +1,8 @@
+hash: a016dc0ed7430a3e2d8f4f36e473ae6f61c71aa0995090f31b9ba645b648b9cc
+updated: 2017-06-09T14:41:24.08966529-04:00
+imports:
+- name: github.com/drhodes/golorem
+  version: ecccc744c2d953a1e13cbe5e5fc5d4cbc9b8daeb
+- name: github.com/mathieunls/gripper
+  version: 3853fe60cd5335a026323e7d2fb2cdbcd3dc3fb6
+testImports: []

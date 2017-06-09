@@ -1,0 +1,7 @@
+package: github.com/mathieunls/gripper
+import:
+- package: github.com/gonum/plot
+  subpackages:
+  - plotter
+  - plotutil
+  - vg
