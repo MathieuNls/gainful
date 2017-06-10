@@ -5,11 +5,13 @@ import (
 	"fmt"
 )
 
-type Bst struct {
+//bst is a binary search tree
+type bst struct {
 	root *binaryNode
 }
 
-func (bst *Bst) Add(key int, value interface{}) {
+//Add adds a new key/value in the bst
+func (bst *bst) Add(key int, value Indexable) {
 
 	if bst.root == nil {
 		bst.root = &binaryNode{
@@ -21,8 +23,11 @@ func (bst *Bst) Add(key int, value interface{}) {
 	}
 }
 
-func (bst *Bst) FromKeys(keys []int, values []interface{}, sorted bool) {
+//FromKeys constructs a bst from keys array
+//If sorted is true, the tree will be balanced
+func FromKeys(keys []int, values []Indexable, sorted bool) *bst {
 
+	bst := &bst{}
 	if sorted {
 		bst.root = bst.fromSortedKeys(keys, values, 0, len(keys)-1, nil)
 	} else {
@@ -30,34 +35,39 @@ func (bst *Bst) FromKeys(keys []int, values []interface{}, sorted bool) {
 			bst.Add(keys[i], values[i])
 		}
 	}
+	return bst
 }
 
-func (bst *Bst) FloorKey(key int) (*binaryNode, error) {
+//FloorKey returns the neareast lowest node with regards to key
+func (bst *bst) FloorKey(key int) (*binaryNode, error) {
 
 	return bst.floorKey(key, bst.root)
 }
 
-func (bst *Bst) Print() {
+//Print prinst the bst
+func (bst *bst) Print() {
 	bst.print(bst.root, 0)
 }
 
-func (bst *Bst) Fetch(key int) (*binaryNode, error) {
+//Fetch fetches a key
+func (bst *bst) Fetch(key int) (*binaryNode, error) {
 
 	return bst.fetch(key, bst.root)
 
 }
 
-func (bst *Bst) floorKey(key int, from *binaryNode) (*binaryNode, error) {
+func (bst *bst) floorKey(key int, from *binaryNode) (*binaryNode, error) {
 
 	if from != nil {
 		//we found it
 		if key == from.key {
+			return from, nil
+			//supposed to go right, nothing there
+		} else if from.right == nil && key >= from.key {
 
 			return from, nil
-		} else if
-		//supposed to go left or right, nothing there
-		(from.left == nil && key < from.key) ||
-			(from.right == nil && key >= from.key) {
+			//supposed to go left, nothing there
+		} else if from.left == nil && key < from.key {
 			return from.parent, nil
 		} else if key < from.key {
 			return bst.floorKey(key, from.left)
@@ -69,7 +79,7 @@ func (bst *Bst) floorKey(key int, from *binaryNode) (*binaryNode, error) {
 	return nil, errors.New("key not found")
 }
 
-func (bst *Bst) fetch(key int, from *binaryNode) (*binaryNode, error) {
+func (bst *bst) fetch(key int, from *binaryNode) (*binaryNode, error) {
 
 	if from != nil {
 		if key == from.key {
@@ -84,7 +94,7 @@ func (bst *Bst) fetch(key int, from *binaryNode) (*binaryNode, error) {
 	return nil, errors.New("key not found")
 }
 
-func (bst *Bst) fromSortedKeys(keys []int, values []interface{}, start int, end int, parent *binaryNode) *binaryNode {
+func (bst *bst) fromSortedKeys(keys []int, values []Indexable, start int, end int, parent *binaryNode) *binaryNode {
 
 	if end-start >= 0 {
 
@@ -102,7 +112,7 @@ func (bst *Bst) fromSortedKeys(keys []int, values []interface{}, start int, end 
 	return nil
 }
 
-func (bst *Bst) add(key int, value interface{}, node *binaryNode) {
+func (bst *bst) add(key int, value Indexable, node *binaryNode) {
 
 	if key < node.key {
 		if node.left == nil {
@@ -127,7 +137,7 @@ func (bst *Bst) add(key int, value interface{}, node *binaryNode) {
 	}
 }
 
-func (bst *Bst) print(node *binaryNode, indent int) {
+func (bst *bst) print(node *binaryNode, indent int) {
 
 	if node != nil {
 		bst.print(node.right, indent+4)

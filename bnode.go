@@ -7,7 +7,7 @@ import (
 type binaryNode struct {
 	parent, left, right *binaryNode
 	key                 int
-	value               interface{}
+	value               Indexable
 }
 
 func (node *binaryNode) String() string {
