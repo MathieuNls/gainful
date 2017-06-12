@@ -1,4 +1,4 @@
-package gainful
+package index
 
 import (
 	"testing"
@@ -8,10 +8,11 @@ import (
 	"fmt"
 
 	lorem "github.com/drhodes/golorem"
+	"github.com/mathieunls/gainful/src/indexable"
 	"github.com/mathieunls/gripper"
 )
 
-func TestNewIndex(t *testing.T) {
+func TestNew(t *testing.T) {
 
 	values := []string{
 		"Three Rings for the Elven-kings under the sky,",
@@ -24,50 +25,50 @@ func TestNewIndex(t *testing.T) {
 		"In the Land of Mordor where the Shadows lie.",
 	}
 
-	indexables := make([]Indexable, len(values))
+	indexables := make([]indexable.HasStringIndex, len(values))
 
 	for i := 0; i < len(values); i++ {
-		indexables[i] = newIndexable(values[i])
+		indexables[i] = indexable.New(values[i])
 	}
 
-	index := NewIndex(indexables)
+	i := New(indexables)
 
 	//a word
-	results := index.Find("sky", -1)
+	results := i.Find("sky", -1)
 
 	if len(results) != 1 || results[0].StringIndex() != values[0] {
 		t.Error("expected", values[0], "got", results)
 	}
 
 	//word in middle with many matches
-	results = index.Find("where", -1)
+	results = i.Find("where", -1)
 
 	if len(results) != 2 || results[0].StringIndex() != values[4] || results[1].StringIndex() != values[7] {
 		t.Error("expected", values[4], "got", results)
 	}
 
 	//reduce the matches
-	results = index.Find("where", 1)
+	results = i.Find("where", 1)
 
 	if len(results) != 1 || results[0].StringIndex() != values[4] {
 		t.Error("expected", values[4], "got", results)
 	}
 
 	//end words
-	results = index.Find("lie.", -1)
+	results = i.Find("lie.", -1)
 	if len(results) != 2 || results[0].StringIndex() != values[4] || results[1].StringIndex() != values[7] {
 		t.Error("expected", values[4], "got", results)
 	}
 
 	//start words
-	results = index.Find("In", -1)
+	results = i.Find("In", -1)
 
 	if len(results) != 2 || results[0].StringIndex() != values[4] || results[1].StringIndex() != values[7] {
 		t.Error("expected", values[4], "got", results)
 	}
 
 	//One sentence with multiple match - erased
-	results = index.Find("One", -1)
+	results = i.Find("One", -1)
 
 	if len(results) != 3 {
 		t.Error("expected 3 got", results)
@@ -88,50 +89,50 @@ func TestNewSequential(t *testing.T) {
 		"In the Land of Mordor where the Shadows lie.",
 	}
 
-	indexables := make([]Indexable, len(values))
+	indexables := make([]indexable.HasStringIndex, len(values))
 
 	for i := 0; i < len(values); i++ {
-		indexables[i] = newIndexable(values[i])
+		indexables[i] = indexable.New(values[i])
 	}
 
-	index := NewIndex(indexables)
+	i := New(indexables)
 
 	//a word
-	results := index.FindSequential("sky", -1)
+	results := i.FindSequential("sky", -1)
 
 	if len(results) != 1 || results[0].StringIndex() != values[0] {
 		t.Error("expected", values[0], "got", results)
 	}
 
 	//word in middle with many matches
-	results = index.FindSequential("where", -1)
+	results = i.FindSequential("where", -1)
 
 	if len(results) != 2 || results[0].StringIndex() != values[4] || results[1].StringIndex() != values[7] {
 		t.Error("expected", values[4], "got", results)
 	}
 
 	//reduce the matches
-	results = index.FindSequential("where", 1)
+	results = i.FindSequential("where", 1)
 
 	if len(results) != 1 || results[0].StringIndex() != values[4] {
 		t.Error("expected", values[4], "got", results)
 	}
 
 	//end words
-	results = index.FindSequential("lie.", -1)
+	results = i.FindSequential("lie.", -1)
 	if len(results) != 2 || results[0].StringIndex() != values[4] || results[1].StringIndex() != values[7] {
 		t.Error("expected", values[4], "got", results)
 	}
 
 	//start words
-	results = index.FindSequential("In", -1)
+	results = i.FindSequential("In", -1)
 
 	if len(results) != 2 || results[0].StringIndex() != values[4] || results[1].StringIndex() != values[7] {
 		t.Error("expected", values[4], "got", results)
 	}
 
 	//One sentence with multiple match - erased
-	results = index.FindSequential("One", -1)
+	results = i.FindSequential("One", -1)
 
 	if len(results) != 3 {
 		t.Error("expected 3 got", results)
@@ -163,7 +164,7 @@ func TestPerformances(t *testing.T) {
 		AnalyzeWithGeneratedData(
 			func(size int) []interface{} {
 				r := make([]interface{}, 2)
-				f := NewIndex(dataset(size))
+				f := New(dataset(size))
 				r[0] = f
 				r[1] = lorem.Word(5, 15)
 				fmt.Println("running sequential with", size)
@@ -178,7 +179,7 @@ func TestPerformances(t *testing.T) {
 		AnalyzeWithGeneratedData(
 			func(size int) []interface{} {
 				r := make([]interface{}, 2)
-				f := NewIndex(dataset(size))
+				f := New(dataset(size))
 				r[0] = f
 				r[1] = lorem.Word(5, 15)
 				fmt.Println("running parralel with", size)
@@ -196,9 +197,9 @@ func TestPerformances(t *testing.T) {
 
 func dumb(data []interface{}) {
 
-	indexables := data[0].([]Indexable)
+	indexables := data[0].([]indexable.HasStringIndex)
 	word := data[1].(string)
-	results := []Indexable{}
+	results := []indexable.HasStringIndex{}
 
 	for i := 0; i < len(indexables); i++ {
 		if strings.Contains(indexables[i].StringIndex(), word) {
@@ -222,12 +223,12 @@ func parralel(data []interface{}) {
 	f = nil
 }
 
-func dataset(size int) []Indexable {
+func dataset(size int) []indexable.HasStringIndex {
 
-	indexables := make([]Indexable, size)
+	indexables := make([]indexable.HasStringIndex, size)
 
 	for i := 0; i < size; i++ {
-		indexables[i] = newIndexable(lorem.Sentence(10, 100))
+		indexables[i] = indexable.New(lorem.Sentence(10, 100))
 	}
 	return indexables
 }

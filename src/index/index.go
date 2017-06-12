@@ -1,53 +1,52 @@
-package gainful
+package index
 
 import (
 	"index/suffixarray"
 	"runtime"
 	"strings"
+
+	"github.com/mathieunls/gainful/src/binary"
+	"github.com/mathieunls/gainful/src/indexable"
 )
 
 type Index struct {
 	sa  *suffixarray.Index
-	bst *bst
+	bst *binary.Tree
 }
 
-type Indexable interface {
-	StringIndex() string
-}
-
-func NewIndex(values []Indexable) *Index {
+func New(values []indexable.HasStringIndex) *Index {
 
 	keys := make([]int, len(values))
 	stringValues := make([]string, len(values))
 
 	fs := &Index{}
 
-	currLength := 1
+	currLength := 0
 
 	for i := 0; i < len(values); i++ {
 		keys[i] = currLength
 		str := values[i].StringIndex()
-		currLength += len(str) + 1
+		currLength += len(str) + 0
 		stringValues[i] = str
 	}
 
-	fs.bst = FromKeys(keys, values, true)
+	fs.bst = binary.FromKeys(keys, values, true)
 
-	joinedStrings := "\x00" + strings.Join(stringValues, "\x00")
+	joinedStrings := "" + strings.Join(stringValues, "")
 
 	fs.sa = suffixarray.New([]byte(joinedStrings))
 
 	return fs
 }
 
-func (fs *Index) Find(search string, n int) []Indexable {
+func (fs *Index) Find(search string, n int) []indexable.HasStringIndex {
 
 	offsets := fs.sa.Lookup([]byte(search), n)
-	results := []Indexable{}
+	results := []indexable.HasStringIndex{}
 	knownKeys := make(map[int]struct{})
 
 	keys := make(chan int, len(offsets))
-	resultsChan := make(chan *binaryNode, len(offsets))
+	resultsChan := make(chan *binary.Node, len(offsets))
 
 	for i := 0; i < runtime.NumCPU(); i++ {
 		go fs.bstLookupWorker(keys, resultsChan)
@@ -64,9 +63,9 @@ func (fs *Index) Find(search string, n int) []Indexable {
 		node := <-resultsChan
 
 		if node != nil {
-			if _, present := knownKeys[node.key]; !present {
-				knownKeys[node.key] = struct{}{}
-				results = append(results, node.value)
+			if _, present := knownKeys[node.Key]; !present {
+				knownKeys[node.Key] = struct{}{}
+				results = append(results, node.Value)
 			}
 		}
 	}
@@ -74,26 +73,26 @@ func (fs *Index) Find(search string, n int) []Indexable {
 	return results
 }
 
-func (fs *Index) FindSequential(search string, n int) []Indexable {
+func (fs *Index) FindSequential(search string, n int) []indexable.HasStringIndex {
 
 	offsets := fs.sa.Lookup([]byte(search), n)
-	results := []Indexable{}
+	results := []indexable.HasStringIndex{}
 	knownKeys := make(map[int]struct{})
 
 	for _, off := range offsets {
 
 		node, err := fs.bst.FloorKey(off)
 
-		if _, present := knownKeys[node.key]; !present && err == nil {
-			knownKeys[node.key] = struct{}{}
-			results = append(results, node.value)
+		if _, present := knownKeys[node.Key]; !present && err == nil {
+			knownKeys[node.Key] = struct{}{}
+			results = append(results, node.Value)
 		}
 	}
 
 	return results
 }
 
-func (fs *Index) bstLookupWorker(keys <-chan int, results chan *binaryNode) {
+func (fs *Index) bstLookupWorker(keys <-chan int, results chan *binary.Node) {
 
 	for key := range keys {
 		node, _ := fs.bst.FloorKey(key)
