@@ -4,7 +4,7 @@ go:
   - tip
 
 script: 
-  - pwd
+  - go get -t -v ./...
   - make build
   - make test
 
