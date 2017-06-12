@@ -5,7 +5,6 @@ go:
 
 script: 
   - curl https://glide.sh/get | sh
-  - make install
   - make build
   - make test
 

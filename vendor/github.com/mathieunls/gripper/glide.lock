@@ -1,0 +1,49 @@
+hash: 008837d1d47b1d79de0e1fc67c7ede8d6a058adc2a3a17abddef63121176b4f3
+updated: 2017-06-08T11:20:46.066073514-04:00
+imports:
+- name: bitbucket.org/zombiezen/gopdf
+  version: 1c63dc69751bc45441c2ce1f56b631c55294b4d5
+  subpackages:
+  - pdf
+- name: github.com/ajstarks/svgo
+  version: fec71ff44529c89ddb4211a62f3d672f31e50bc5
+- name: github.com/golang/freetype
+  version: bcfeb16b74e8aea9e2fe043406f2ef74b1cb0759
+  subpackages:
+  - raster
+  - truetype
+- name: github.com/gonum/floats
+  version: a2cbc5c70616cd18491ef2843231f6ce28b2cb02
+- name: github.com/gonum/internal
+  version: 4c20688f849035792bcee8a94ec93b5c277c919f
+  subpackages:
+  - asm/f64
+- name: github.com/gonum/plot
+  version: 395bf7867dd5a3c85271e0b53fb222d8516d3750
+  subpackages:
+  - palette
+  - plotter
+  - plotutil
+  - tools/bezier
+  - vg
+  - vg/draw
+  - vg/fonts
+  - vg/vgeps
+  - vg/vgimg
+  - vg/vgpdf
+  - vg/vgsvg
+- name: github.com/llgcode/draw2d
+  version: dcbfbe505d35de8166ccfc47ff9e4bb020473e18
+  subpackages:
+  - draw2dbase
+  - draw2dimg
+- name: golang.org/x/image
+  version: 426cfd8eeb6e08ab1932954e09e3c2cb2bc6e36d
+  subpackages:
+  - draw
+  - font
+  - math/f64
+  - math/fixed
+  - tiff
+  - tiff/lzw
+testImports: []
