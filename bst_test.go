@@ -154,7 +154,6 @@ func TestSortedKeys(t *testing.T) {
 	}
 
 	bst := FromKeys(ints, values, true)
-	bst.Print()
 
 	if bst.root.key != 8 || bst.root.value.StringIndex() != "8" {
 		t.Error("Expected 8/8 got", bst.root, bst.root.value)

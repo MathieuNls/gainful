@@ -1,7 +1,6 @@
 package gainful
 
 import (
-	"fmt"
 	"index/suffixarray"
 	"runtime"
 	"strings"
@@ -32,14 +31,9 @@ func NewIndex(values []Indexable) *Index {
 		stringValues[i] = str
 	}
 
-	fmt.Println("keys", keys)
-	fmt.Println("values", values)
-
 	fs.bst = FromKeys(keys, values, true)
 
 	joinedStrings := "\x00" + strings.Join(stringValues, "\x00")
-
-	fmt.Println(joinedStrings)
 
 	fs.sa = suffixarray.New([]byte(joinedStrings))
 
@@ -48,13 +42,9 @@ func NewIndex(values []Indexable) *Index {
 
 func (fs *Index) Find(search string, n int) []Indexable {
 
-	fmt.Println("looking for", search)
-
 	offsets := fs.sa.Lookup([]byte(search), n)
 	results := []Indexable{}
 	knownKeys := make(map[int]struct{})
-
-	fmt.Println("offsets", offsets)
 
 	keys := make(chan int, len(offsets))
 	resultsChan := make(chan *binaryNode, len(offsets))
@@ -81,17 +71,12 @@ func (fs *Index) Find(search string, n int) []Indexable {
 		}
 	}
 
-	fmt.Println("results", len(results))
-
 	return results
 }
 
 func (fs *Index) FindSequential(search string, n int) []Indexable {
 
-	fmt.Println("looking for", search)
-
 	offsets := fs.sa.Lookup([]byte(search), n)
-	fmt.Println("offsets", offsets)
 	results := []Indexable{}
 	knownKeys := make(map[int]struct{})
 
@@ -104,8 +89,6 @@ func (fs *Index) FindSequential(search string, n int) []Indexable {
 			results = append(results, node.value)
 		}
 	}
-
-	fmt.Println("results", len(results))
 
 	return results
 }

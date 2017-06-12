@@ -1,8 +1,53 @@
 hash: a016dc0ed7430a3e2d8f4f36e473ae6f61c71aa0995090f31b9ba645b648b9cc
-updated: 2017-06-09T14:41:24.08966529-04:00
+updated: 2017-06-11T10:57:35.109025924-04:00
 imports:
 - name: github.com/drhodes/golorem
   version: ecccc744c2d953a1e13cbe5e5fc5d4cbc9b8daeb
 - name: github.com/mathieunls/gripper
-  version: 3853fe60cd5335a026323e7d2fb2cdbcd3dc3fb6
-testImports: []
+  version: 85fbf26fd8af448e40a360f3403343dfb49c9179
+testImports:
+- name: bitbucket.org/zombiezen/gopdf
+  version: 1c63dc69751bc45441c2ce1f56b631c55294b4d5
+  subpackages:
+  - pdf
+- name: github.com/ajstarks/svgo
+  version: fec71ff44529c89ddb4211a62f3d672f31e50bc5
+- name: github.com/golang/freetype
+  version: e2365dfdc4a05e4b8299a783240d4a7d5a65d4e4
+  subpackages:
+  - raster
+  - truetype
+- name: github.com/gonum/floats
+  version: a2cbc5c70616cd18491ef2843231f6ce28b2cb02
+- name: github.com/gonum/internal
+  version: 4c20688f849035792bcee8a94ec93b5c277c919f
+  subpackages:
+  - asm/f64
+- name: github.com/gonum/plot
+  version: 51b62dc5319d7fce41240d13e780a93e640b9a38
+  subpackages:
+  - palette
+  - plotter
+  - plotutil
+  - tools/bezier
+  - vg
+  - vg/draw
+  - vg/fonts
+  - vg/vgeps
+  - vg/vgimg
+  - vg/vgpdf
+  - vg/vgsvg
+- name: github.com/llgcode/draw2d
+  version: dcbfbe505d35de8166ccfc47ff9e4bb020473e18
+  subpackages:
+  - draw2dbase
+  - draw2dimg
+- name: golang.org/x/image
+  version: 426cfd8eeb6e08ab1932954e09e3c2cb2bc6e36d
+  subpackages:
+  - draw
+  - font
+  - math/f64
+  - math/fixed
+  - tiff
+  - tiff/lzw
