@@ -4,7 +4,7 @@ go:
   - tip
 
 script: 
-  - curl https://glide.sh/get | sh
+  - pwd
   - make build
   - make test
 
