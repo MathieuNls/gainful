@@ -4,7 +4,10 @@ go:
   - tip
 
 script: 
-  - go test -covermode=atomic -coverprofile=coverage.txt
+  - curl https://glide.sh/get | sh
+  - make install
+  - make build
+  - make test
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)
