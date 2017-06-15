@@ -7,31 +7,49 @@ import (
 	"github.com/mathieunls/gainful/src/indexable"
 )
 
+//NavigableTree is a kind of tree that can return key closest
+//to the demanded key
+type NavigableTree interface {
+	Add(key int, value indexable.HasStringIndex)
+	FloorKey(key int) (*Node, error)
+	Print()
+	Fetch(key int) (*Node, error)
+	Root() *Node
+}
+
 //Tree is a binary search tree
+//with a recusive add method
 type Tree struct {
-	Root *Node
+	root *Node
+}
+
+//Root returns the root
+func (tree *Tree) Root() *Node {
+	return tree.root
 }
 
 //Add adds a new key/value in the tree
+//Complexity is O(log(n)) where N is a the number
+//of key in the tree
 func (tree *Tree) Add(key int, value indexable.HasStringIndex) {
 
-	if tree.Root == nil {
-		tree.Root = &Node{
+	if tree.root == nil {
+		tree.root = &Node{
 			Value: value,
 			Key:   key,
 		}
 	} else {
-		tree.add(key, value, tree.Root)
+		tree.add(key, value, tree.root)
 	}
 }
 
-//FromKeys constructs a tree from keys array
+//NewTree constructs a tree from keys array
 //If sorted is true, the tree will be balanced
-func FromKeys(keys []int, values []indexable.HasStringIndex, sorted bool) *Tree {
+func NewTree(keys []int, values []indexable.HasStringIndex, sorted bool) NavigableTree {
 
 	tree := &Tree{}
 	if sorted {
-		tree.Root = tree.fromSortedKeys(keys, values, 0, len(keys)-1, nil)
+		tree.root = tree.fromSortedKeys(keys, values, 0, len(keys)-1, nil)
 	} else {
 		for i := 0; i < len(keys); i++ {
 			tree.Add(keys[i], values[i])
@@ -41,21 +59,28 @@ func FromKeys(keys []int, values []indexable.HasStringIndex, sorted bool) *Tree 
 }
 
 //FloorKey returns the neareast lowest node with regards to key
+//Complexity is O(log(n)) where N is a the number
+//of key in the tree
 func (tree *Tree) FloorKey(key int) (*Node, error) {
 
-	return tree.floorKey(key, tree.Root)
+	return tree.floorKey(key, tree.root)
 }
 
 //Print prinst the tree
 func (tree *Tree) Print() {
-	tree.print(tree.Root, 0)
+	tree.print(tree.root, 0)
 }
 
 //Fetch fetches a key
+//Complexity is O(log(n)) where N is a the number
+//of key in the tree
 func (tree *Tree) Fetch(key int) (*Node, error) {
 
-	return tree.fetch(key, tree.Root)
+	return tree.fetch(key, tree.root)
+}
 
+func (tree *Tree) StringIndex() string {
+	return tree.root.Value.StringIndex()
 }
 
 func (tree *Tree) floorKey(key int, from *Node) (*Node, error) {

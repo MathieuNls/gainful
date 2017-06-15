@@ -12,32 +12,32 @@ func TestAdd(t *testing.T) {
 
 	bst.Add(10, indexable.New("a string"))
 
-	if bst.Root.Key != 10 || bst.Root.Value.StringIndex() != "a string" {
-		t.Error("Expected 10/a string got", bst.Root)
+	if bst.Root().Key != 10 || bst.Root().Value.StringIndex() != "a string" {
+		t.Error("Expected 10/a string got", bst.Root())
 	}
 
 	bst.Add(15, indexable.New("another"))
 
-	if bst.Root.Right.Key != 15 || bst.Root.Right.Value.StringIndex() != "another" {
-		t.Error("Expected 15/another got", bst.Root.Right, bst.Root.Right.Value)
+	if bst.Root().Right.Key != 15 || bst.Root().Right.Value.StringIndex() != "another" {
+		t.Error("Expected 15/another got", bst.Root().Right, bst.Root().Right.Value)
 	}
 
 	bst.Add(8, indexable.New("another 8"))
 
-	if bst.Root.Left.Key != 8 || bst.Root.Left.Value.StringIndex() != "another 8" {
-		t.Error("Expected 8/another 8 got", bst.Root.Left, bst.Root.Left.Value)
+	if bst.Root().Left.Key != 8 || bst.Root().Left.Value.StringIndex() != "another 8" {
+		t.Error("Expected 8/another 8 got", bst.Root().Left, bst.Root().Left.Value)
 	}
 
 	bst.Add(6, indexable.New("another 6"))
 
-	if bst.Root.Left.Left.Key != 6 || bst.Root.Left.Left.Value.StringIndex() != "another 6" {
-		t.Error("Expected 8/another 8 got", bst.Root.Left.Left, bst.Root.Left.Left.Value)
+	if bst.Root().Left.Left.Key != 6 || bst.Root().Left.Left.Value.StringIndex() != "another 6" {
+		t.Error("Expected 8/another 8 got", bst.Root().Left.Left, bst.Root().Left.Left.Value)
 	}
 
 	bst.Add(16, indexable.New("another 16"))
 
-	if bst.Root.Right.Right.Key != 16 || bst.Root.Right.Right.Value.StringIndex() != "another 16" {
-		t.Error("Expected 16/another 16 got", bst.Root.Right.Right, bst.Root.Right.Right.Value)
+	if bst.Root().Right.Right.Key != 16 || bst.Root().Right.Right.Value.StringIndex() != "another 16" {
+		t.Error("Expected 16/another 16 got", bst.Root().Right.Right, bst.Root().Right.Right.Value)
 	}
 }
 
@@ -124,22 +124,22 @@ func TestAddKeys(t *testing.T) {
 		indexable.New("another 19"),
 	}
 
-	bst := FromKeys(ints, Values, false)
+	bst := NewTree(ints, Values, false)
 
-	if bst.Root.Right.Key != 15 || bst.Root.Right.Value.StringIndex() != "another" {
-		t.Error("Expected 15/another got", bst.Root.Right, bst.Root.Right.Value)
+	if bst.Root().Right.Key != 15 || bst.Root().Right.Value.StringIndex() != "another" {
+		t.Error("Expected 15/another got", bst.Root().Right, bst.Root().Right.Value)
 	}
 
-	if bst.Root.Left.Key != 8 || bst.Root.Left.Value.StringIndex() != "another 8" {
-		t.Error("Expected 8/another 8 got", bst.Root.Left, bst.Root.Left.Value)
+	if bst.Root().Left.Key != 8 || bst.Root().Left.Value.StringIndex() != "another 8" {
+		t.Error("Expected 8/another 8 got", bst.Root().Left, bst.Root().Left.Value)
 	}
 
-	if bst.Root.Left.Left.Key != 6 || bst.Root.Left.Left.Value.StringIndex() != "another 6" {
-		t.Error("Expected 8/another 8 got", bst.Root.Left.Left, bst.Root.Left.Left.Value)
+	if bst.Root().Left.Left.Key != 6 || bst.Root().Left.Left.Value.StringIndex() != "another 6" {
+		t.Error("Expected 8/another 8 got", bst.Root().Left.Left, bst.Root().Left.Left.Value)
 	}
 
-	if bst.Root.Right.Right.Key != 19 || bst.Root.Right.Right.Value.StringIndex() != "another 19" {
-		t.Error("Expected 19/another 19 got", bst.Root.Right.Right, bst.Root.Right.Right.Value)
+	if bst.Root().Right.Right.Key != 19 || bst.Root().Right.Right.Value.StringIndex() != "another 19" {
+		t.Error("Expected 19/another 19 got", bst.Root().Right.Right, bst.Root().Right.Right.Value)
 	}
 
 }
@@ -157,22 +157,22 @@ func TestSortedKeys(t *testing.T) {
 		indexable.New("19"),
 	}
 
-	bst := FromKeys(ints, Values, true)
+	bst := NewTree(ints, Values, true)
 
-	if bst.Root.Key != 8 || bst.Root.Value.StringIndex() != "8" {
-		t.Error("Expected 8/8 got", bst.Root, bst.Root.Value)
+	if bst.Root().Key != 8 || bst.Root().Value.StringIndex() != "8" {
+		t.Error("Expected 8/8 got", bst.Root(), bst.Root().Value)
 	}
 
-	if bst.Root.Left.Key != 5 || bst.Root.Left.Value.StringIndex() != "5" {
-		t.Error("Expected 5/5 got", bst.Root.Left, bst.Root.Left.Value)
+	if bst.Root().Left.Key != 5 || bst.Root().Left.Value.StringIndex() != "5" {
+		t.Error("Expected 5/5 got", bst.Root().Left, bst.Root().Left.Value)
 	}
 
-	if bst.Root.Left.Left.Key != 3 || bst.Root.Left.Left.Value.StringIndex() != "3" {
-		t.Error("Expected 3/3 got", bst.Root.Left.Left, bst.Root.Left.Left.Value)
+	if bst.Root().Left.Left.Key != 3 || bst.Root().Left.Left.Value.StringIndex() != "3" {
+		t.Error("Expected 3/3 got", bst.Root().Left.Left, bst.Root().Left.Left.Value)
 	}
 
-	if bst.Root.Right.Right.Key != 19 || bst.Root.Right.Right.Value.StringIndex() != "19" {
-		t.Error("Expected 19/19 got", bst.Root.Right.Right, bst.Root.Right.Right.Value)
+	if bst.Root().Right.Right.Key != 19 || bst.Root().Right.Right.Value.StringIndex() != "19" {
+		t.Error("Expected 19/19 got", bst.Root().Right.Right, bst.Root().Right.Right.Value)
 	}
 
 }

@@ -31,44 +31,44 @@ func TestNew(t *testing.T) {
 		indexables[i] = indexable.New(values[i])
 	}
 
-	i := New(indexables)
+	i := NewSearchIndex(indexables)
 
 	//a word
-	results := i.Find("sky", -1)
+	results := i.Lookup("sky", -1)
 
 	if len(results) != 1 || results[0].StringIndex() != values[0] {
 		t.Error("expected", values[0], "got", results)
 	}
 
 	//word in middle with many matches
-	results = i.Find("where", -1)
+	results = i.Lookup("where", -1)
 
 	if len(results) != 2 || results[0].StringIndex() != values[4] || results[1].StringIndex() != values[7] {
 		t.Error("expected", values[4], "got", results)
 	}
 
 	//reduce the matches
-	results = i.Find("where", 1)
+	results = i.Lookup("where", 1)
 
 	if len(results) != 1 || results[0].StringIndex() != values[4] {
 		t.Error("expected", values[4], "got", results)
 	}
 
 	//end words
-	results = i.Find("lie.", -1)
+	results = i.Lookup("lie.", -1)
 	if len(results) != 2 || results[0].StringIndex() != values[4] || results[1].StringIndex() != values[7] {
 		t.Error("expected", values[4], "got", results)
 	}
 
 	//start words
-	results = i.Find("In", -1)
+	results = i.Lookup("In", -1)
 
 	if len(results) != 2 || results[0].StringIndex() != values[4] || results[1].StringIndex() != values[7] {
 		t.Error("expected", values[4], "got", results)
 	}
 
 	//One sentence with multiple match - erased
-	results = i.Find("One", -1)
+	results = i.Lookup("One", -1)
 
 	if len(results) != 3 {
 		t.Error("expected 3 got", results)
@@ -95,7 +95,7 @@ func TestNewSequential(t *testing.T) {
 		indexables[i] = indexable.New(values[i])
 	}
 
-	i := New(indexables)
+	i := NewSearchIndex(indexables)
 
 	//a word
 	results := i.FindSequential("sky", -1)
@@ -164,7 +164,7 @@ func TestPerformances(t *testing.T) {
 		AnalyzeWithGeneratedData(
 			func(size int) []interface{} {
 				r := make([]interface{}, 2)
-				f := New(dataset(size))
+				f := NewSearchIndex(dataset(size))
 				r[0] = f
 				r[1] = lorem.Word(5, 15)
 				fmt.Println("running sequential with", size)
@@ -179,7 +179,7 @@ func TestPerformances(t *testing.T) {
 		AnalyzeWithGeneratedData(
 			func(size int) []interface{} {
 				r := make([]interface{}, 2)
-				f := New(dataset(size))
+				f := NewSearchIndex(dataset(size))
 				r[0] = f
 				r[1] = lorem.Word(5, 15)
 				fmt.Println("running parralel with", size)
@@ -210,16 +210,16 @@ func dumb(data []interface{}) {
 
 func sequential(data []interface{}) {
 
-	f := data[0].(*Index)
+	f := data[0].(*SearchIndex)
 	word := data[1].(string)
 	f.FindSequential(word, -1)
 	f = nil
 }
 
 func parralel(data []interface{}) {
-	f := data[0].(*Index)
+	f := data[0].(*SearchIndex)
 	word := data[1].(string)
-	f.Find(word, -1)
+	f.Lookup(word, -1)
 	f = nil
 }
 

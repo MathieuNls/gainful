@@ -1,7 +1,6 @@
 package index
 
 import (
-	"index/suffixarray"
 	"runtime"
 	"strings"
 
@@ -9,18 +8,22 @@ import (
 	"github.com/mathieunls/gainful/src/indexable"
 )
 
-type Index struct {
-	sa  *suffixarray.Index
-	bst *binary.Tree
+type SearchIndex struct {
+	sa  *Index
+	bst binary.NavigableTree
 }
 
-func New(values []indexable.HasStringIndex) *Index {
+func NewSearchIndex(values []indexable.HasStringIndex) *SearchIndex {
 
+	fs := &SearchIndex{}
+	fs.init(values)
+
+	return fs
+}
+
+func (fs *SearchIndex) init(values []indexable.HasStringIndex) {
 	keys := make([]int, len(values))
 	stringValues := make([]string, len(values))
-
-	fs := &Index{}
-
 	currLength := 0
 
 	for i := 0; i < len(values); i++ {
@@ -30,18 +33,25 @@ func New(values []indexable.HasStringIndex) *Index {
 		stringValues[i] = str
 	}
 
-	fs.bst = binary.FromKeys(keys, values, true)
+	fs.newTree(keys, values, true)
 
 	joinedStrings := "" + strings.Join(stringValues, "")
 
-	fs.sa = suffixarray.New([]byte(joinedStrings))
-
-	return fs
+	fs.sa = New([]byte(joinedStrings))
 }
 
-func (fs *Index) Find(search string, n int) []indexable.HasStringIndex {
+//newTree purpose is to be overrided by other Indexes
+//with other trees implementation
+func (fs *SearchIndex) newTree(keys []int, values []indexable.HasStringIndex, sorted bool) {
+	fs.bst = binary.NewTree(keys, values, sorted)
+}
 
-	offsets := fs.sa.Lookup([]byte(search), n)
+func (fs *SearchIndex) Lookup(search string, n int) []indexable.HasStringIndex {
+
+	return fs.findPara(fs.sa.Lookup([]byte(search), n))
+}
+
+func (fs *SearchIndex) findPara(offsets []int) []indexable.HasStringIndex {
 	results := []indexable.HasStringIndex{}
 	knownKeys := make(map[int]struct{})
 
@@ -73,7 +83,7 @@ func (fs *Index) Find(search string, n int) []indexable.HasStringIndex {
 	return results
 }
 
-func (fs *Index) FindSequential(search string, n int) []indexable.HasStringIndex {
+func (fs *SearchIndex) FindSequential(search string, n int) []indexable.HasStringIndex {
 
 	offsets := fs.sa.Lookup([]byte(search), n)
 	results := []indexable.HasStringIndex{}
@@ -92,7 +102,7 @@ func (fs *Index) FindSequential(search string, n int) []indexable.HasStringIndex
 	return results
 }
 
-func (fs *Index) bstLookupWorker(keys <-chan int, results chan *binary.Node) {
+func (fs *SearchIndex) bstLookupWorker(keys <-chan int, results chan *binary.Node) {
 
 	for key := range keys {
 		node, _ := fs.bst.FloorKey(key)
