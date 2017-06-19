@@ -51,9 +51,29 @@ func (fs *SearchIndex) newTree(keys []int, values []indexable.HasStringIndex, so
 	fs.bst = gpbt.NewTree(keys, interfaceSlice, sorted)
 }
 
-func (fs *SearchIndex) Lookup(search string, n int) []indexable.HasStringIndex {
+func (fs *SearchIndex) Lookup(
+	search string,
+	n int,
+	sort func([]indexable.HasStringIndex) []indexable.HasStringIndex) []indexable.HasStringIndex {
 
-	return fs.findPara(fs.sa.Lookup([]byte(search), n))
+	results := []indexable.HasStringIndex{}
+	s := []byte(search)
+
+	if len(s) > 0 && n != 0 {
+		matches := fs.sa.lookupAll(s)
+		results = fs.findPara(matches)
+
+		if n == -1 {
+			n = len(results)
+		}
+
+		if sort == nil {
+			return results[0:n]
+		}
+		return sort(results)[0:n]
+
+	}
+	return results
 }
 
 func (fs *SearchIndex) findPara(offsets []int) []indexable.HasStringIndex {

@@ -34,41 +34,41 @@ func TestNew(t *testing.T) {
 	i := NewSearchIndex(indexables)
 
 	//a word
-	results := i.Lookup("sky", -1)
+	results := i.Lookup("sky", -1, nil)
 
 	if len(results) != 1 || results[0].StringIndex() != values[0] {
 		t.Error("expected", values[0], "got", results)
 	}
 
 	//word in middle with many matches
-	results = i.Lookup("where", -1)
+	results = i.Lookup("where", -1, nil)
 
 	if len(results) != 2 || results[0].StringIndex() != values[4] || results[1].StringIndex() != values[7] {
 		t.Error("expected", values[4], "got", results)
 	}
 
 	//reduce the matches
-	results = i.Lookup("where", 1)
+	results = i.Lookup("where", 1, nil)
 
 	if len(results) != 1 || results[0].StringIndex() != values[4] {
 		t.Error("expected", values[4], "got", results)
 	}
 
 	//end words
-	results = i.Lookup("lie.", -1)
+	results = i.Lookup("lie.", -1, nil)
 	if len(results) != 2 || results[0].StringIndex() != values[4] || results[1].StringIndex() != values[7] {
 		t.Error("expected", values[4], "got", results)
 	}
 
 	//start words
-	results = i.Lookup("In", -1)
+	results = i.Lookup("In", -1, nil)
 
 	if len(results) != 2 || results[0].StringIndex() != values[4] || results[1].StringIndex() != values[7] {
 		t.Error("expected", values[4], "got", results)
 	}
 
 	//One sentence with multiple match - erased
-	results = i.Lookup("One", -1)
+	results = i.Lookup("One", -1, nil)
 
 	if len(results) != 3 {
 		t.Error("expected 3 got", results)
@@ -219,7 +219,7 @@ func sequential(data []interface{}) {
 func parralel(data []interface{}) {
 	f := data[0].(*SearchIndex)
 	word := data[1].(string)
-	f.Lookup(word, -1)
+	f.Lookup(word, -1, nil)
 	f = nil
 }
 
