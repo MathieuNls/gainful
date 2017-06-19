@@ -4,13 +4,13 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/mathieunls/gainful/src/binary"
 	"github.com/mathieunls/gainful/src/indexable"
+	gpbt "github.com/mathieunls/gpbt/src"
 )
 
 type SearchIndex struct {
 	sa  *Index
-	bst binary.NavigableTree
+	bst gpbt.NavigableTree
 }
 
 func NewSearchIndex(values []indexable.HasStringIndex) *SearchIndex {
@@ -43,7 +43,12 @@ func (fs *SearchIndex) init(values []indexable.HasStringIndex) {
 //newTree purpose is to be overrided by other Indexes
 //with other trees implementation
 func (fs *SearchIndex) newTree(keys []int, values []indexable.HasStringIndex, sorted bool) {
-	fs.bst = binary.NewTree(keys, values, sorted)
+
+	var interfaceSlice = make([]interface{}, len(values))
+	for i, d := range values {
+		interfaceSlice[i] = d
+	}
+	fs.bst = gpbt.NewTree(keys, interfaceSlice, sorted)
 }
 
 func (fs *SearchIndex) Lookup(search string, n int) []indexable.HasStringIndex {
@@ -56,7 +61,7 @@ func (fs *SearchIndex) findPara(offsets []int) []indexable.HasStringIndex {
 	knownKeys := make(map[int]struct{})
 
 	keys := make(chan int, len(offsets))
-	resultsChan := make(chan *binary.Node, len(offsets))
+	resultsChan := make(chan *gpbt.Node, len(offsets))
 
 	for i := 0; i < runtime.NumCPU(); i++ {
 		go fs.bstLookupWorker(keys, resultsChan)
@@ -75,7 +80,7 @@ func (fs *SearchIndex) findPara(offsets []int) []indexable.HasStringIndex {
 		if node != nil {
 			if _, present := knownKeys[node.Key]; !present {
 				knownKeys[node.Key] = struct{}{}
-				results = append(results, node.Value)
+				results = append(results, node.Value.(indexable.HasStringIndex))
 			}
 		}
 	}
@@ -95,14 +100,14 @@ func (fs *SearchIndex) FindSequential(search string, n int) []indexable.HasStrin
 
 		if _, present := knownKeys[node.Key]; !present && err == nil {
 			knownKeys[node.Key] = struct{}{}
-			results = append(results, node.Value)
+			results = append(results, node.Value.(indexable.HasStringIndex))
 		}
 	}
 
 	return results
 }
 
-func (fs *SearchIndex) bstLookupWorker(keys <-chan int, results chan *binary.Node) {
+func (fs *SearchIndex) bstLookupWorker(keys <-chan int, results chan *gpbt.Node) {
 
 	for key := range keys {
 		node, _ := fs.bst.FloorKey(key)

@@ -1,8 +1,10 @@
-hash: a016dc0ed7430a3e2d8f4f36e473ae6f61c71aa0995090f31b9ba645b648b9cc
-updated: 2017-06-11T10:57:35.109025924-04:00
+hash: 616e5da90f69602bde94aaf0c45feaccea6eaf033b23123c3964ff309608acd8
+updated: 2017-06-19T11:25:34.4602914-04:00
 imports:
 - name: github.com/drhodes/golorem
   version: ecccc744c2d953a1e13cbe5e5fc5d4cbc9b8daeb
+- name: github.com/MathieuNls/gpbt
+  version: 3275fa76109a90b9f6c7ce4253e45db99c9875f4
 - name: github.com/mathieunls/gripper
   version: 85fbf26fd8af448e40a360f3403343dfb49c9179
 testImports:

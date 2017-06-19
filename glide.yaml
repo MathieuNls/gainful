@@ -2,3 +2,4 @@ package: github.com/mathieunls/gainful
 import:
 - package: github.com/mathieunls/gripper
 - package: github.com/drhodes/golorem
+- package: github.com/MathieuNls/gpbt

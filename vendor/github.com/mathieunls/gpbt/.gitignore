@@ -1,0 +1,5 @@
+coverage.txt
+coverage.html
+.glide/*
+.vscode/*
+src/gpbt.cover.out
