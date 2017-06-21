@@ -167,15 +167,37 @@ func (x *Index) Bytes() []byte {
 }
 
 func (x *Index) at(i int) []byte {
+
 	return x.data[x.sa[i]:]
+}
+
+func searchWithMin(min int, n int, f func(int) bool) int {
+	// Define f(-1) == false and f(n) == true.
+	// Invariant: f(i-1) == false, f(j) == true.
+	i, j := min, n
+	for i < j {
+		h := i + (j-i)/2 // avoid overflow when computing h
+		// i ≤ h < j
+		if !f(h) {
+			i = h + 1 // preserves f(i-1) == false
+		} else {
+			j = h // preserves f(j) == true
+		}
+	}
+	// i == j, f(i-1) == false, and f(j) (= f(i)) == true  =>  answer is i.
+	return i
 }
 
 // lookupAll returns a slice into the matching region of the index.
 // The runtime is O(log(N)*len(s)).
-func (x *Index) lookupAll(s []byte) []int {
+func (x *Index) lookupAll(s []byte, start int, end int) []int {
+
+	if end > len(x.sa) || end == -1 {
+		end = len(x.sa)
+	}
 	// find matching suffix index range [i:j]
 	// find the first index where s would be the prefix
-	i := sort.Search(len(x.sa), func(i int) bool { return bytes.Compare(x.at(i), s) >= 0 })
+	i := searchWithMin(start, end, func(i int) bool { return bytes.Compare(x.at(i), s) >= 0 })
 	// starting at i, find the first index at which s is not a prefix
 	j := i + sort.Search(len(x.sa)-i, func(j int) bool { return !bytes.HasPrefix(x.at(j+i), s) })
 	return x.sa[i:j]
@@ -187,9 +209,9 @@ func (x *Index) lookupAll(s []byte) []int {
 // Lookup time is O(log(N)*len(s) + len(result)) where N is the
 // size of the indexed data.
 //
-func (x *Index) Lookup(s []byte, n int) (result []int) {
+func (x *Index) Lookup(s []byte, n int, start int) (result []int) {
 	if len(s) > 0 && n != 0 {
-		matches := x.lookupAll(s)
+		matches := x.lookupAll(s, start, -1)
 		if n < 0 || len(matches) < n {
 			n = len(matches)
 		}
@@ -230,7 +252,7 @@ func (x *Index) FindAllIndex(r *regexp.Regexp, n int) (result [][]int) {
 		// indices in the first place (if it returned fewer than that then
 		// there cannot be more).
 		for n1 := n; ; n1 += 2 * (n - len(result)) /* overflow ok */ {
-			indices := x.Lookup(lit, n1)
+			indices := x.Lookup(lit, n1, 0)
 			if len(indices) == 0 {
 				return
 			}
@@ -274,7 +296,7 @@ func (x *Index) FindAllIndex(r *regexp.Regexp, n int) (result [][]int) {
 
 	// same comment about Lookup applies here as in the loop above
 	for n1 := n; ; n1 += 2 * (n - len(result)) /* overflow ok */ {
-		indices := x.Lookup(lit, n1)
+		indices := x.Lookup(lit, n1, 0)
 		if len(indices) == 0 {
 			return
 		}

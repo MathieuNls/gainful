@@ -12,7 +12,6 @@ type FastIndex struct {
 func NewFastIndex(values []indexable.HasStringIndex) *FastIndex {
 
 	fs := &FastIndex{}
-	fs.init(values)
 	return fs
 }
 

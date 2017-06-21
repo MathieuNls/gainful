@@ -34,41 +34,41 @@ func TestNew(t *testing.T) {
 	i := NewSearchIndex(indexables)
 
 	//a word
-	results := i.Lookup("sky", -1, nil)
+	_, _, _, results := i.Lookup("sky", 0, -1, -1, nil)
 
 	if len(results) != 1 || results[0].StringIndex() != values[0] {
 		t.Error("expected", values[0], "got", results)
 	}
 
 	//word in middle with many matches
-	results = i.Lookup("where", -1, nil)
+	_, _, _, results = i.Lookup("where", 0, -1, -1, nil)
 
 	if len(results) != 2 || results[0].StringIndex() != values[4] || results[1].StringIndex() != values[7] {
 		t.Error("expected", values[4], "got", results)
 	}
 
 	//reduce the matches
-	results = i.Lookup("where", 1, nil)
+	_, _, _, results = i.Lookup("where", 0, -1, 1, nil)
 
 	if len(results) != 1 || results[0].StringIndex() != values[4] {
 		t.Error("expected", values[4], "got", results)
 	}
 
 	//end words
-	results = i.Lookup("lie.", -1, nil)
+	_, _, _, results = i.Lookup("lie.", 0, -1, -1, nil)
 	if len(results) != 2 || results[0].StringIndex() != values[4] || results[1].StringIndex() != values[7] {
 		t.Error("expected", values[4], "got", results)
 	}
 
 	//start words
-	results = i.Lookup("In", -1, nil)
+	_, _, _, results = i.Lookup("In", 0, -1, -1, nil)
 
 	if len(results) != 2 || results[0].StringIndex() != values[4] || results[1].StringIndex() != values[7] {
 		t.Error("expected", values[4], "got", results)
 	}
 
 	//One sentence with multiple match - erased
-	results = i.Lookup("One", -1, nil)
+	_, _, _, results = i.Lookup("One", 0, -1, -1, nil)
 
 	if len(results) != 3 {
 		t.Error("expected 3 got", results)
@@ -98,41 +98,41 @@ func TestNewSequential(t *testing.T) {
 	i := NewSearchIndex(indexables)
 
 	//a word
-	results := i.FindSequential("sky", -1)
+	results := i.FindSequential("sky", 10, -1)
 
 	if len(results) != 1 || results[0].StringIndex() != values[0] {
 		t.Error("expected", values[0], "got", results)
 	}
 
 	//word in middle with many matches
-	results = i.FindSequential("where", -1)
+	results = i.FindSequential("where", 0, -1)
 
 	if len(results) != 2 || results[0].StringIndex() != values[4] || results[1].StringIndex() != values[7] {
 		t.Error("expected", values[4], "got", results)
 	}
 
 	//reduce the matches
-	results = i.FindSequential("where", 1)
+	results = i.FindSequential("where", 0, 1)
 
 	if len(results) != 1 || results[0].StringIndex() != values[4] {
 		t.Error("expected", values[4], "got", results)
 	}
 
 	//end words
-	results = i.FindSequential("lie.", -1)
+	results = i.FindSequential("lie.", 0, -1)
 	if len(results) != 2 || results[0].StringIndex() != values[4] || results[1].StringIndex() != values[7] {
 		t.Error("expected", values[4], "got", results)
 	}
 
 	//start words
-	results = i.FindSequential("In", -1)
+	results = i.FindSequential("In", 0, -1)
 
 	if len(results) != 2 || results[0].StringIndex() != values[4] || results[1].StringIndex() != values[7] {
 		t.Error("expected", values[4], "got", results)
 	}
 
 	//One sentence with multiple match - erased
-	results = i.FindSequential("One", -1)
+	results = i.FindSequential("One", 0, -1)
 
 	if len(results) != 3 {
 		t.Error("expected 3 got", results)
@@ -212,14 +212,14 @@ func sequential(data []interface{}) {
 
 	f := data[0].(*SearchIndex)
 	word := data[1].(string)
-	f.FindSequential(word, -1)
+	f.FindSequential(word, 0, -1)
 	f = nil
 }
 
 func parralel(data []interface{}) {
 	f := data[0].(*SearchIndex)
 	word := data[1].(string)
-	f.Lookup(word, -1, nil)
+	f.Lookup(word, 0, -1, -1, nil)
 	f = nil
 }
 
