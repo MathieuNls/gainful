@@ -1,25 +1,38 @@
 package index
 
 import (
+	"fmt"
 	"runtime"
 	"strings"
 	"time"
 
 	"github.com/mathieunls/gainful/src/indexable"
-	gpbt "github.com/mathieunls/gpbt/src"
+	"github.com/mathieunls/gpbt/src"
 )
 
-//SearchIndex indexes things
 type SearchIndex struct {
-	sa  *Index
-	bst gpbt.NavigableTree
+	sa      *Index
+	bst     gpbt.NavigableTree
+	newTree func(keys []int, values []indexable.HasStringIndex, sorted bool)
 }
 
-//NewSearchIndex creates a new search index for the values
 func NewSearchIndex(values []indexable.HasStringIndex) *SearchIndex {
 
 	fs := &SearchIndex{}
+	fs.newTree = func(keys []int, values []indexable.HasStringIndex, sorted bool) {
 
+		var interfaceSlice = make([]interface{}, len(values))
+		for i, d := range values {
+			interfaceSlice[i] = d
+		}
+		fs.bst = gpbt.NewTree(keys, interfaceSlice, sorted)
+	}
+	fs.init(values)
+
+	return fs
+}
+
+func (fs *SearchIndex) init(values []indexable.HasStringIndex) {
 	keys := make([]int, len(values))
 	stringValues := make([]string, len(values))
 	currLength := 0
@@ -36,19 +49,6 @@ func NewSearchIndex(values []indexable.HasStringIndex) *SearchIndex {
 	joinedStrings := "" + strings.Join(stringValues, "")
 
 	fs.sa = New([]byte(joinedStrings))
-
-	return fs
-}
-
-//newTree purpose is to be overrided by other Indexes
-//with other trees implementation
-func (fs *SearchIndex) newTree(keys []int, values []indexable.HasStringIndex, sorted bool) {
-
-	var interfaceSlice = make([]interface{}, len(values))
-	for i, d := range values {
-		interfaceSlice[i] = d
-	}
-	fs.bst = gpbt.NewTree(keys, interfaceSlice, sorted)
 }
 
 //Lookup searches for the search string with respect to
@@ -67,8 +67,7 @@ func (fs *SearchIndex) Lookup(
 	start int,
 	end int,
 	n int,
-	sort func([]indexable.HasStringIndex) []indexable.HasStringIndex,
-) (
+	sort func([]indexable.HasStringIndex) []indexable.HasStringIndex) (
 	elapsedTime int64,
 	resultsCount int,
 	lastIndex int,
@@ -76,83 +75,18 @@ func (fs *SearchIndex) Lookup(
 ) {
 
 	startTime := time.Now()
-	s := []byte(search)
 
-	if len(s) > 0 && n != 0 {
-		matches := fs.sa.lookupAll(s, start, end)
+	if len(search) > 0 && n != 0 {
 
-		if n == -1 {
-			n = len(matches)
-		}
+		tmp := fs.sa.Lookup([]byte(search), n, 0)
+		fmt.Println(tmp)
+		matches := fs.findPara(tmp)
 
-		resultsCount = len(results)
-
-		if sort == nil {
-			return time.Since(startTime).Nanoseconds(), resultsCount, matches[n-1], results
-		}
-		return time.Since(startTime).Nanoseconds(), resultsCount, matches[n-1], sort(results)
+		return time.Since(startTime).Nanoseconds(), len(matches), 0, matches
 
 	}
-	return time.Since(startTime).Nanoseconds(), 0, 0, results
-}
 
-//Facet creates an faceted hashmap according to the
-//result of the facetableField function.
-//The facetableField function can't be nil.
-//The results used to created to faceted results are the one
-//from the Lookup function.
-//The reader should refer to it to understand the parameters.
-func (fs *SearchIndex) Facet(
-	search string,
-	start int,
-	end int,
-	n int,
-	facetableField func(indexable.HasStringIndex) string,
-	sort func([]indexable.HasStringIndex) []indexable.HasStringIndex,
-) (
-	elapsedTime int64,
-	resultsCount int,
-	lastIndex int,
-	facets map[string][]indexable.HasStringIndex,
-) {
-
-	elapsedTime, resultsCount, lastIndex, results := fs.Lookup(search, start, end, n, sort)
-	startTime := time.Now()
-	facets = make(map[string][]indexable.HasStringIndex)
-
-	for _, r := range results {
-
-		facetableValue := facetableField(r)
-		if _, present := facets[facetableField(r)]; !present {
-			facets[facetableValue] = []indexable.HasStringIndex{r}
-		} else {
-
-			facets[facetableValue] = append(facets[facetableValue], r)
-		}
-	}
-
-	return elapsedTime + time.Since(startTime).Nanoseconds(), resultsCount, lastIndex, facets
-}
-
-//FindSequential is a sequential version of Lookup and allows
-//to check the sanity and efficiency of the || algorithms.
-func (fs *SearchIndex) FindSequential(search string, start int, n int) []indexable.HasStringIndex {
-
-	offsets := fs.sa.Lookup([]byte(search), n, start)
-	results := []indexable.HasStringIndex{}
-	knownKeys := make(map[int]struct{})
-
-	for _, off := range offsets {
-
-		node, err := fs.bst.FloorKey(off)
-
-		if _, present := knownKeys[node.Key]; !present && err == nil {
-			knownKeys[node.Key] = struct{}{}
-			results = append(results, node.Value.(indexable.HasStringIndex))
-		}
-	}
-
-	return results
+	return 0, 0, 0, nil
 }
 
 func (fs *SearchIndex) findPara(offsets []int) []indexable.HasStringIndex {
@@ -181,6 +115,27 @@ func (fs *SearchIndex) findPara(offsets []int) []indexable.HasStringIndex {
 				knownKeys[node.Key] = struct{}{}
 				results = append(results, node.Value.(indexable.HasStringIndex))
 			}
+		}
+	}
+
+	return results
+}
+
+//FindSequential is a sequential version of Lookup and allows
+//to check the sanity and efficiency of the || algorithm
+func (fs *SearchIndex) FindSequential(search string, start int, n int) []indexable.HasStringIndex {
+
+	offsets := fs.sa.Lookup([]byte(search), n, start)
+	results := []indexable.HasStringIndex{}
+	knownKeys := make(map[int]struct{})
+
+	for _, off := range offsets {
+
+		node, err := fs.bst.FloorKey(off)
+
+		if _, present := knownKeys[node.Key]; !present && err == nil {
+			knownKeys[node.Key] = struct{}{}
+			results = append(results, node.Value.(indexable.HasStringIndex))
 		}
 	}
 

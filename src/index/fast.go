@@ -9,16 +9,19 @@ type FastIndex struct {
 	SearchIndex
 }
 
-func NewFastIndex(values []indexable.HasStringIndex) *FastIndex {
+func NewFastIndex(values []indexable.HasStringIndex, threads int) *FastIndex {
 
 	fs := &FastIndex{}
-	return fs
-}
+	fs.SearchIndex.newTree = func(keys []int, values []indexable.HasStringIndex, sorted bool) {
 
-func (fs *FastIndex) newTree(keys []int, values []indexable.HasStringIndex, sorted bool) {
-	var interfaceSlice = make([]interface{}, len(values))
-	for i, d := range values {
-		interfaceSlice[i] = d
+		var interfaceSlice = make([]interface{}, len(values))
+		for i, d := range values {
+			interfaceSlice[i] = d
+		}
+		fs.SearchIndex.bst = gpbt.NewParralelTree(keys, interfaceSlice, threads)
+		fs.SearchIndex.bst.Print()
 	}
-	fs.SearchIndex.bst = gpbt.NewParralelTree(keys, interfaceSlice, -1)
+	fs.init(values)
+
+	return fs
 }

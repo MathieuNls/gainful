@@ -24,6 +24,8 @@ func NewParralelTree(keys []int, values []interface{}, threads int) NavigableTre
 
 	if threads == -1 {
 		tree.threads = runtime.NumCPU()
+	} else if threads > len(values) {
+		tree.threads = len(values)
 	} else {
 		tree.threads = threads
 	}
