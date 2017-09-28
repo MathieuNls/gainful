@@ -5,11 +5,8 @@ import (
 
 	"strings"
 
-	"fmt"
-
 	lorem "github.com/drhodes/golorem"
 	"github.com/mathieunls/gainful/src/indexable"
-	"github.com/mathieunls/gripper"
 )
 
 func TestNew(t *testing.T) {
@@ -140,6 +137,7 @@ func TestNewSequential(t *testing.T) {
 
 }
 
+/*
 func TestPerformances(t *testing.T) {
 
 	max := 10
@@ -194,7 +192,7 @@ func TestPerformances(t *testing.T) {
 		Plot("data size", "ms", "Time complexity", "testing2.png")
 
 }
-
+*/
 func dumb(data []interface{}) {
 
 	indexables := data[0].([]indexable.HasStringIndex)
